@@ -4,8 +4,10 @@
    
    Tests check fma (which is assumed present and working by the code), then check double-double multiply and subtract, finally divide.
    These check the "lower level" double-double functions as well.
-   Note these tests assume "#define USE_ACCURATE_ALG" has been used in double-doube.c, some (4) will fail if this is not present.
-   double-double "power" functions have their own test program in "power10" and so are not checked here.
+
+Compile with:
+
+ gcc main.c -lm -lquadmath
 
  expected output:
 sizeof float=4 double=8 long double=16
@@ -19,20 +21,12 @@ number of bits in mantissa of double is DBL_MANT_DIG=53  and max exponent is 2^D
 number of bits in mantissa of long double is LDBL_MANT_DIG=64  and max exponent is 2^LDBL_MAX_EXP=16384 max exponent (decimal)=LDBL_MAX_10_EXP=4932
  max difference between 1 and next larger representable number for doubles is  DBL_EPSILON=((double)2.22044604925031308084726333618164062e-16L)
 number of bits in mantissa of float128 is __FLT128_MANT_DIG__=113  and max exponent is 2^__FLT128_MAX_EXP__=16384 max exponent (decimal)=__FLT128_MAX_10_EXP__=4932
-__GNUC__ defined, __GNUC__=15 __GNUC_MINOR__=2
-__MINGW32__ defined and is set to 1
-__USE_MINGW_ANSI_STDIO is defined as 0
-Using UCRT for sprintf() &  snprintf()
-__MINGW64__ defined and is set to 1
-_UCRT defined and is set to
-__MSVCRT__ defined and is set to 1
-_WIN32 defined and is set to 1
-_WIN64 defined and is set to 1
+__GNUC__ defined, __GNUC__=13 __GNUC_MINOR__=3
+__MINGW32__ is not defined
 __x86_64 defined and is set to 1
-
-Checking long double functions:
- long double functions: 0 errors
-
+__SSE4_2__ defined and is set to 1
+__AVX2__ defined and is set to 1
+__FMA__ defined and is set to 1
 Checking fma functions:
 double (DBL_EPSILON = 2.22044604925031308084726333618164062e-16 so e^2=4.9303806576313237838233035330172e-32 :
 1+epsilon=1.00000000000000022e+00 1+2*epsilon=1.00000000000000044e+00
@@ -42,59 +36,50 @@ double (DBL_EPSILON = 2.22044604925031308084726333618164062e-16 so e^2=4.9303806
  all f128=4.930380657631323783823303533017414e-32
   - double check passed
 
-long double (LDBL_EPSILON = 1.08420217248550443400745280086994171e-19 so e^2=1.1754943508222875079687365372222e-38 :
-1+epsilon=1.000000000000000000108e+00 1+2*epsilon=1.000000000000000000217e+00
-   direct=0.000000000000000000000e+00
-     fmal=1.175494350822287507969e-38
-     f128=0.000000000000000000000000000000000e+00
- all f128=1.175494350822287507968736537222246e-38
-  - long double check passed
-
-float128 (FLT128_EPSILON = 1.92592994438723585305597794258492732e-34 so e^2=3.7092061506874213857317352615475e-68 :
-1+epsilon=1.000000000000000000000000000000000193e+00 1+2*epsilon=1.000000000000000000000000000000000385e+00
-   direct=0.000000000000000000000000000000000000e+00
-     fmaq=3.709206150687421385731735261547639513e-68
-  - float128 check passed
-
-double-double (DBL_EPSILON = 2.22044604925031308084726333618164062e-16 so e^2=4.9303806576313237838233035330172e-32 :
+Checking double-double functions:
+double-double (DBL_EPSILON = (2.2204460492503130808e-16,2.2204460492503130808e-16) 2.22044604925031308084726333618164062e-16 so e^2=4.9303806576313237838233035330172e-32 :
+Using e=3.3881317890172013563e-21
+{1+e}:
+   double-double=1.00000000000000000e+00 3.38813178901720136e-21
+            f128=1.000000000000000000003388131789017e+00
+   error=0.000000000000000000000000000000000e+00
+1+e as a double is 1
+fast2sum(1,e):
+   double-double=1.00000000000000000e+00 3.38813178901720136e-21
+            f128=1.000000000000000000003388131789017e+00
+   error=0.000000000000000000000000000000000e+00
+{1+e}+{1+e}:
+   double-double=2.00000000000000000e+00 6.77626357803440271e-21
+            f128=2.000000000000000000006776263578034e+00
+   error=0.000000000000000000000000000000000e+00
+{1+e}+{1+2e}:
+   double-double=2.00000000000000000e+00 1.01643953670516041e-20
+            f128=2.000000000000000000010164395367052e+00
+   error=0.000000000000000000000000000000000e+00
+{1+e}+{1-e}:
+   double-double=2.00000000000000000e+00 0.00000000000000000e+00
+            f128=2.000000000000000000000000000000000e+00
+   error=0.000000000000000000000000000000000e+00
  (1+e)*(1+e) - (1+2e) gives:
-   double-double=4.93038065763132378e-32 0.00000000000000000e+00
-            f128=4.930380657631323783823303533017414e-32
+   double-double=0.00000000000000000e+00 0.00000000000000000e+00
+            f128=0.000000000000000000000000000000000e+00
+   error=0.000000000000000000000000000000000e+00
  (1+e)*(1-e) gives (should be 1-e^2):
-   double-double=1.00000000000000000e+00 -4.93038065763132378e-32
-            f128=9.999999999999999999999999999999507e-01
-          f128-1=-4.930380657631323783823303533017414e-32
-  - double-double check passed
-
-long double-double (LDBL_EPSILON = 1.08420217248550443400745280086994171e-19 so e^2=1.1754943508222875079687365372222e-38 :
- (1+e)*(1+e) - (1+2e) gives:
-   double-double=1.175494350822287507969e-38 0.000000000000000000000e+00
-            f128=1.175494350822287507968736537222246e-38
- (1+e)*(1-e) gives (should be 1-e^2):
-   double-double=1.000000000000000000000e+00 -1.175494350822287507969e-38
-          f128-1=-1.175494350822287507968736537222246e-38
-  - long double-double check passed
-
-float128-double-double: (FLT128_EPSILON = 1.92592994438723585305597794258492732e-34 so e^2=3.7092061506874213857317352615475e-68 :
-1+epsilon=1.000000000000000000000000000000000193e+00 1+2*epsilon=1.000000000000000000000000000000000385e+00
- (1+e)*(1+e) - (1+2e) gives:
-                 direct= 0.000000000000000000000000000000000000e+00
-                   fmaq= 3.709206150687421385731735261547639513e-68
-  as f128 double-double= 3.709206150687421385731735261547639513e-68 , 0.000000000000000000000000000000000000e+00
- (1+e)*(1-e) gives (should be 1-e^2):
-  as f128 double-double= 1.000000000000000000000000000000000000e+00 , -3.709206150687421385731735261547639513e-68
-  - double-double-float128 check passed
+   double-double=1.00000000000000000e+00 0.00000000000000000e+00
+            f128=1.000000000000000000000000000000000e+00
+   error=0.000000000000000000000000000000000e+00
+  - double-double all tests passed
 
 
-Checking double double multiply and divide for accuracy
+Checking double double divide for accuracy
  355/113 (approximation to pi):
- as dd =3.14159292035398252e+00,-2.20079608421269966e-16
+ as dd =3.14159292035398208e+00,2.24009601428792650e-16
  dd's combined to f128's=3.141592920353982300884955752212392e+00
                as f128's=3.141592920353982300884955752212389e+00
               Difference=3.081487911019577364889564708135884e-33
       Test passed
  (355+e)/(113) (e=double epsilon):
- as dd =3.14159292035398252e+00,-2.18114611917508624e-16
+ as dd =3.14159292035398208e+00,2.25974597932553992e-16
  dd's combined to f128's=3.141592920353982302849952255973734e+00
                as f128's=3.141592920353982302849952255973728e+00
               Difference=6.162975822039154729779129416271767e-33
@@ -106,24 +91,11 @@ Checking double double multiply and divide for accuracy
               Difference=-9.629649721936179265279889712924637e-33
       Test passed
  (355+e/1e+14)/(113+e/1e+14) (e=double epsilon):
- as dd =3.14159292035398252e+00,-2.20079608421270015e-16
+ as dd =3.14159292035398208e+00,2.24009601428792601e-16
  dd's combined to f128's=3.141592920353982300884955752212343e+00
                as f128's=3.141592920353982300884955752212347e+00
               Difference=-4.237045877651918876723151473686840e-33
       Test passed
-
- Long-double-double:
- (355+e/1e+15)/(113+e/1e+15) (e=double epsilon):
- as ldd =3.141592920353982300872e+00,1.343259328742682016264e-20
- ldd's combined to f128's=3.141592920353982300884955752212385e+00
-                as f128's=3.141592920353982300884955752212386e+00
-               Difference=-3.851859888774471706111955885169855e-34
-      Test passed
-  above result calculated as double-double f128
-                         =3.141592920353982300884955752212385e+00,5.609308119860504523507473129697090e-35
-      Test passed
-
-
 All tests passed
 
   
@@ -163,7 +135,6 @@ All tests passed
 #include <inttypes.h>
 #include <ctype.h>
 #include <stdarg.h>
-#include "../my_printf/my_printf.h"
 #include "../ya_double_double/ya_double_double.h"
 
 

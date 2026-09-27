@@ -57,12 +57,12 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
   #pragma GCC push_options
   #pragma GCC optimize ("-O3") /* cannot use Ofast, normally -O3 is OK. Note macro expansion does not work here ! */
  #ifdef  __x86_64  
-   #pragma GCC target("avx2") /*  -mavx2 [for fma] */
+   #pragma GCC target("avx2,fma") /*  -mavx2 [for fma] */
   #endif
  #endif
  // based on  https://jdebp.uk/FGA/predefined-macros-processor.html "__i386__" is set by GCC,Clang,Intel which is good enough as the outer #if limits us to gcc and clang
  #ifdef __i386__
-   #pragma GCC target("sse2,fpmath=sse,avx2") /* -msse2 and -mfpmath=sse, -mavx2 [the later for fma] */
+   #pragma GCC target("sse2,fpmath=sse,avx2,fma") /* -msse2 and -mfpmath=sse, -mavx2 [the later for fma] */
  #endif 
 #endif
 
@@ -83,7 +83,7 @@ struct _DoubleDouble
 typedef struct _DoubleDouble DoubleDouble;/* 2 doubles */
 
 #ifdef __SIZEOF_FLOAT128__
- static inline __float128 dd_to_f128(DoubleDouble x) // convert a double-double to  afloat128
+ static inline __float128 dd_to_f128(DoubleDouble x) // convert a double-double to  a float128
  {return (__float128)x.hi+(__float128)x.lo;
  }
  #endif
