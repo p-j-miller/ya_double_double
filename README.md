@@ -54,7 +54,7 @@ Both FMA and Division are based on implementations in the CORE-MATH project - ht
 # Installation
 It is recommended that the files from this repository are placed in a directory called ya_double-double
 
-It can be compiled on Linux , or on Windows using for example WinLibs gcc from https://winlibs.com/ with 
+The test program can be compiled on Linux , or on Windows using for example WinLibs gcc from https://winlibs.com/ with 
 ~~~
 gcc main.c -lm -lquadmath
 ~~~
@@ -67,20 +67,20 @@ When executed as "./a.out" on Linux or "a" on Windows the last line of the outpu
 int main(int argc, char *argv[])
 { DoubleDouble x={1,0},y={3,0},z;// x=1, y=3
   z=div_dd_dd(x,y); // 1/3
-  printf("1/3=%.20g,%.20g\n",z.hi,z.lo);
+  printf("1/3=%.32g,%.20g\n",z.hi,z.lo);// assumes %.32g will actually print 32 accurate digits - gcc is normally OK for this
   printf("As doubles 1/3=%.20g\n",(double)1.0/(double)3.0);
 }
 ~~~
-This can be compiled with on Linux, or on Windows using for example WinLibs gcc from https://winlibs.com/ 
+This can be compiled with gcc on Linux, or on Windows using for example WinLibs gcc from https://winlibs.com/ 
 ~~~
 gcc -m64 example.c -lm
 ~~~
-and the executed as "./a.out" on Linux or "a" on Windows to give:
+and then executed as "./a.out" on Linux or "a" on Windows to give:
 ~~~
-1/3=0.33333333333333331483,1.8503717077085941313e-17
+1/3=0.33333333333333331482961625624739,1.8503717077085941313e-17
 As doubles 1/3=0.33333333333333331483
 ~~~
-Adding "z.hi" and "z.lo" will give a higher resolution result, in this case it gives 0.33333333333333333333371707708594 (which has 21 3's 5 more than the double result).
+Adding "z.hi" and "z.lo" will give a higher resolution result, in this case it gives 0.33333333333333333333333333333333 , which has 32 3's, twice as many as the double result (16).
 Remember the exact result is an infinite number of 3's. 
 
 See the algorithms section above for references giving the accuracy of the results ("hi"+"lo" is always significantly more accurate than just using a double, and in most cases is more accurate than using __float128's (and more portable as not all compilers support __float128's)).
